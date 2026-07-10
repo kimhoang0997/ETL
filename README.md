@@ -1,5 +1,5 @@
 To demonstrate a complete data mining workflow, I present an empirical example: extracting data from the World Bank website (https://data.worldbank.org/indicator). The data processing workflow involves multiple steps and the selection of supporting tools; the implementation diagram is as follows:
-![image](https://github.com/user-attachments/assets/43cc0ab6-236d-43eb-9fb5-5357a250b10a)
+<img width="373" height="443" alt="image" src="https://github.com/user-attachments/assets/84a9b751-b0f4-41b1-85f7-d3bb83dc1ef5" />
 
 The report covers the following topics:
 1.	Introduction to the website https://data.worldbank.org/indicator and the available data.
@@ -22,7 +22,7 @@ III.1.	Extract
 
 Web data extraction is performed using a Python script named `scraping.py`, utilizing the `urllib` and XPath libraries. The data is saved to a local folder.
 
-![image](https://github.com/user-attachments/assets/7642cf39-a53d-4dde-a1a5-12069854c295)
+<img width="469" height="477" alt="image" src="https://github.com/user-attachments/assets/dbfbd3b0-4350-4ce6-b379-cf702bab62a3" />
 
 III.2.	Transform - Load
 
@@ -56,7 +56,7 @@ While all the developed tasks could potentially run in parallel, the scraping ta
 The remaining tasks are grouped into a second DAG designed for sequential execution, with the scheduler set to run on a minute-by-minute basis. After each task completes, data in the input directory is deleted to prevent data overlap.
 
 Consequently, upon task completion, new folders are created, but they remain empty.
-![image](https://github.com/user-attachments/assets/3c9afee0-2693-46f0-be06-1bc7f54b3bc3)<br>
+<img width="469" height="259" alt="image" src="https://github.com/user-attachments/assets/674c2827-c3e9-4596-9462-7995e0aa3126" /><br>
 ![image](https://github.com/user-attachments/assets/7e464999-2f18-45dc-a7b5-8c5da40c494b)<br>
 ![image](https://github.com/user-attachments/assets/e8730726-0e57-4e16-8f12-344f0417d994)<br>
 Tasks are defined using Python code located in the dags folder of the Airflow directory:<br>
