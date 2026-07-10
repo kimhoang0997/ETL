@@ -1,43 +1,41 @@
-Với mục tiêu thực hiện được một quy trình đầy đủ để khai thác dữ liệu, em đưa ra một ví dụ thực nghiệm là: Khai thác dữ liệu từ trang web của Worldbank (https://data.worldbank.org/indicator).
-Quy trình xử lý dữ liệu gồm nhiều bước cùng với sự lựa chọn các công cụ hỗ trợ, sau đây là sơ đồ thực hiện:
-
+To demonstrate a complete data mining workflow, I present an empirical example: extracting data from the World Bank website (https://data.worldbank.org/indicator). The data processing workflow involves multiple steps and the selection of supporting tools; the implementation diagram is as follows:
 ![image](https://github.com/user-attachments/assets/43cc0ab6-236d-43eb-9fb5-5357a250b10a)
 
-Báo cáo gồm các nội dung:
-1.	Giới thiệu web https://data.worldbank.org/indicator và các dữ liệu.
-2.	Scraping dữ liệu
-3.	Quy trình biến đổi và load dữ liệu
-4.	Sử dụng Airflow
-5.	Truy vấn SQL và hiển thị dữ liệu bằng Influxdb
+The report covers the following topics:
+1.	Introduction to the website https://data.worldbank.org/indicator and the available data.
+2.	Data scraping.
+3.	Data transformation and loading process.
+4.	Using Airflow.
+5.	SQL querying and data visualization using InfluxDB.
 
-II.	GIỚI THIỆU WEB WORLDBANK VÀ CÁC DỮ LIỆU
+II.	WEB WORLDBANK AND DATA
 
 ![image](https://github.com/user-attachments/assets/6bc8931c-4d92-4299-8cde-58d584bbd2ed)<br>
-Các dữ liệu mà Ngân hàng Thế Giới cung cấp được thu thập trong vòng 50 năm qua, gồm nhiều chủ đề như tài chính, kinh doanh, y tế, kinh tế, phát triển con người. Hiện người dùng đã có thể truy cập trên 7.000 chỉ số phát triển.<br>
-Trang Chỉ số (Indicators) liệt kê 331 chỉ số trong bộ Chỉ số Phát triển Thế giới (WDI) theo vần ABC. Hàng năm, Ngân hàng Thế giới tổng hợp dữ liệu phát triển từ các dữ liệu gốc của mình và các nguồn khác được công nhận trên toàn thế giới để xây dựng bộ Chỉ số Phát triển Thế giới. Đây là công cụ để đánh giá tiến độ phát triển các nền kinh tế. 
-Các con số kể những câu chuyện về con người ở  các quốc gia mới nổi và đang phát triển, qua đó đóng góp một phần vào công cuộc xóa đói giảm nghèo.<br>
-Ở đồ án cuối kỳ này, tôi sẽ lấy các dữ liệu của trang Chỉ số này và dữ liệu được sử dụng để phân tích cũng như hiển thị trên một chương trình ở dưới máy tính cá nhân.
+The data provided by the World Bank has been collected over the past 50 years, covering a wide range of topics such as finance, business, health, economics, and human development. Users can currently access over 7,000 development indicators.<br>
+The "Indicators" page lists 331 indicators from the World Development Indicators (WDI) dataset in alphabetical order. Each year, the World Bank compiles development data from its own primary sources and other globally recognized sources to create the WDI dataset. This serves as a tool for assessing the development progress of economies.<br>
+These figures tell the stories of people in emerging and developing nations, thereby contributing to efforts to alleviate poverty.<br>
+For this final project, I will utilize data from this "Indicators" page to perform analysis and visualize the information through a desktop application.<br>
 
-III.	QUY TRÌNH ETL<br>
+III.	ETL Process<br>
 
 III.1.	Extract
 
-Việc lấy dữ liệu từ web được thực hiện bằng một đoạn code Python tên scraping.py, sử dụng thư viện Urllib và Xpath. Dữ liệu được lưu ở folder trên máy.
+Web data extraction is performed using a Python script named `scraping.py`, utilizing the `urllib` and XPath libraries. The data is saved to a local folder.
 
 ![image](https://github.com/user-attachments/assets/7642cf39-a53d-4dde-a1a5-12069854c295)
 
 III.2.	Transform - Load
 
-Quá trình transform - load gồm có 3 bước:
+The transform-load process consists of three steps:
 
                 Upzip     =>    Cleaning    =>      Processing
                 
-Dữ liệu down về là các file .zip được chứa theo từng thư mục theo từng chỉ số:
+The downloaded data consists of .zip files organized into folders by indicator:
  
 ![image](https://github.com/user-attachments/assets/083aaeb2-46e2-4502-b906-f753454745df)
 
 
-Tiếp đến ta cần xử lý file này để lấy ra các dữ liệu gồm:
+Next, we need to process this file to extract the following data:
 •	Last Update Date
 •	Country Name
 •	Country Code
@@ -45,47 +43,46 @@ Tiếp đến ta cần xử lý file này để lấy ra các dữ liệu gồm:
 •	Indicator Code
 •	Years
 •	Values
-
-Với bảng dữ liệu này, ta xử lý và load lên database của Influxdb bằng đoạn code Python với tên upload.py. Dữ liệu được định dạng theo yêu cầu riêng của Influxdb.
+Using this dataset, we process and load the data into the InfluxDB database via a Python script named `upload.py`. The data is formatted according to InfluxDB's specific requirements.
 
 ![image](https://github.com/user-attachments/assets/b95720dc-1181-4160-ae1e-80412dda5fe9)
 
-IV.	SỬ DỤNG AIRFLOW
+IV.	AIRFLOW
 
-Các source code Python có thể run độc lập. Tuy nhiên, trong quá trình khai thác dữ liệu từ web, dữ liệu cần được cập nhật thường xuyên, các task được chạy tuần tự hoặc song song, việc thiết lập thời gian chạy của mỗi task thế nào thì cần được lên lịch trình và setup chạy cụ thể. Một ứng dụng hữu ích cho mục tiêu này đó là airflow.
+Python scripts can run independently; however, web data extraction requires frequent updates and the execution of tasks either sequentially or in parallel, necessitating a specific schedule and setup for each task's runtime. Apache Airflow is a useful tool for this purpose.
 
-Tất cả các task xây dựng đều có thể chạy song song. Nhưng vì nhiệm vụ Scraping, đây là task cần nhiều thời gian để hoàn thành. Ta để Scraping ở một DAG riêng lẻ. Việc download được setup scheduler là 1 ngày.
+While all the developed tasks could potentially run in parallel, the scraping task is time-consuming, so it is assigned to its own dedicated DAG, with the scheduler configured to run it once a day.
 
-Các task còn lại sẽ được đưa vào DAG thứ hai và thử cách chạy tuần tự, scheduler được setup lặp lại theo từng phút. Sau mỗi task, dữ liệu ở thư mục input sẽ bị xóa đi để tránh chồng lắp dữ liệu.
+The remaining tasks are grouped into a second DAG designed for sequential execution, with the scheduler set to run on a minute-by-minute basis. After each task completes, data in the input directory is deleted to prevent data overlap.
 
-Do đó, khi hoàn thành các task, các folder sẽ được tạo mới, nhưng đây là các folder trống.
+Consequently, upon task completion, new folders are created, but they remain empty.
 ![image](https://github.com/user-attachments/assets/3c9afee0-2693-46f0-be06-1bc7f54b3bc3)<br>
 ![image](https://github.com/user-attachments/assets/7e464999-2f18-45dc-a7b5-8c5da40c494b)<br>
 ![image](https://github.com/user-attachments/assets/e8730726-0e57-4e16-8f12-344f0417d994)<br>
-Các task được xây dựng bằng đoạn code Python được đặt trong folder dags của thư mục Airflow:<br>
+Tasks are defined using Python code located in the dags folder of the Airflow directory:<br>
 ![image](https://github.com/user-attachments/assets/7ae5febd-fbb2-4899-a5fb-09465e14df68)
 
-V.	TRUY VẤN SQL VÀ HIỂN THỊ DỮ LIỆU BẰNG INFLUXDB
+V.	Querying SQL and Displaying Data Using InfluxDB
 
-InfluxDB là một cơ sở dữ liệu chuỗi thời gian phổ biến. Báo cáo sử dụng phiên bản Influxdb 1.8.9. Việc truy vấn trên Influxdb sử dụng một ngôn ngữ giống như SQL. Hiện nay, Influxdb đã phát triển đến phiên bản 2.0 và việc truy vấn đã chuyển sang ngôn ngữ NoSQL. Tuy nhiên, định dạng dữ liệu đưa vô chương trình là không thay đổi.
+InfluxDB is a popular time-series database. This report utilizes version 1.8.9. Queries in InfluxDB are performed using an SQL-like language. Although InfluxDB has since evolved to version 2.0—shifting to a NoSQL-style query language—the format of the data input into the program remains unchanged.
 
 ![image](https://github.com/user-attachments/assets/f58ca8ee-d542-435e-9bfe-bb921d8c5f6f)
 
-So với các hệ cơ sở dữ liệu khác, InfluxDB không cung cấp nhiều dạng biểu đồ, chủ yếu phục vụ cho hiển thị chuỗi dữ liệu thời gian, gồm có:
+Compared to other database systems, InfluxDB does not offer a wide variety of chart types, as it is primarily designed for visualizing time-series data, including:
 
 ![image](https://github.com/user-attachments/assets/7d1ad357-3cac-4b37-8e00-8081f9e2bf58)
 
-Đây là giao diện chương trình để lựa chọn dữ liệu hiển thị
+This is the program interface for selecting the data to display.
 
 ![image](https://github.com/user-attachments/assets/ced37147-6c66-4537-8973-2d4bcb3779fc)
 
-Sau đây là một Dashboard ví dụ từ dữ liệu trang web WorldBank: 
+Here is an example dashboard based on data from the World Bank website:
 
 ![image](https://github.com/user-attachments/assets/63a164e5-4ab7-41cb-8ae9-d909766042ee)
 
-VI.	KẾT LUẬN
+VI.	CONLUSION
 
-Tới đây, quá trình xử lý dữ liệu có thể xem như hoàn thành. Ta có thể phân tích dữ liệu một cách chi tiết hơn nữa. Việc lựa chọn Influxdb ở trong bài báo này không quá phù hợp. Influxdb rất phù hợp nhận dữ liệu streaming từ các thiết bị iot, hiển thị dữ liệu time series, đánh giá tốc độ hệ thống. Với dữ liệu ở báo cáo này, ta có thể tìm kiếm một hệ cơ sở dữ liệu tốt hơn để hiển thị.
+At this stage, the data processing phase can be considered complete. We can proceed to analyze the data in greater detail. The choice of InfluxDB for this study was not entirely suitable; while InfluxDB is excellent for ingesting streaming data from IoT devices, visualizing time-series data, and assessing system performance, the data in this report might be better served by a different database system for visualization purposes.
 
 
 
